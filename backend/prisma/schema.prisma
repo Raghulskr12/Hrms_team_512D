@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  HR
+  EMPLOYEE
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  INTERN
+  CONTRACT
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+  LEAVE
+}
+
+enum LeaveType {
+  PAID
+  SICK
+  UNPAID
+  BEREAVEMENT
+  CASUAL
+  EXAM
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id                String            @id @default(uuid())
+  employeeId        String            @unique
+  email             String            @unique
+  passwordHash      String
+  role              Role              @default(EMPLOYEE)
+  status            UserStatus        @default(ACTIVE)
+  emailVerified     Boolean           @default(false)
+  verificationToken String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  profile           EmployeeProfile?
+  approvedLeaves    LeaveRequest[]    @relation("LeaveApprover")
+  notifications     Notification[]
+
+  @@map("users")
+}
+
+model EmployeeProfile {
+  id              String          @id @default(uuid())
+  userId          String          @unique
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName       String
+  lastName        String
+  phone           String?
+  dateOfBirth     DateTime?
+  gender          String?
+  address         String?
+  city            String?
+  state           String?
+  postalCode      String?
+  profilePicture  String?
+  designation     String
+  department      String
+  employmentType  EmploymentType  @default(FULL_TIME)
+  joiningDate     DateTime
+  manager         String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  bankDetails     BankDetails?
+  attendances     Attendance[]
+  leaveBalances   LeaveBalance[]
+  leaveRequests   LeaveRequest[]  @relation("EmployeeLeaveRequests")
+  salaries        Salary[]
+  documents       Document[]
+
+  @@map("employee_profiles")
+}
+
+model BankDetails {
+  id                String          @id @default(uuid())
+  employeeId        String          @unique
+  employee          EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  accountHolderName String
+  accountNumber     String
+  ifscCode          String
+  bankName          String
+  branchName        String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@map("bank_details")
+}
+
+model Attendance {
+  id          String           @id @default(uuid())
+  employeeId  String
+  employee    EmployeeProfile  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  date        DateTime         @db.Date
+  checkIn     DateTime?
+  checkOut    DateTime?
+  workedHours Float            @default(0.0)
+  status      AttendanceStatus @default(PRESENT)
+  remarks     String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([employeeId, date])
+  @@map("attendances")
+}
+
+model LeaveBalance {
+  id            String          @id @default(uuid())
+  employeeId    String
+  employee      EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType     LeaveType
+  totalDays     Int
+  usedDays      Int             @default(0)
+  remainingDays Int
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([employeeId, leaveType])
+  @@map("leave_balances")
+}
+
+model LeaveRequest {
+  id              String          @id @default(uuid())
+  employeeId      String
+  employee        EmployeeProfile @relation("EmployeeLeaveRequests", fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType       LeaveType
+  startDate       DateTime        @db.Date
+  endDate         DateTime        @db.Date
+  numberOfDays    Int
+  reason          String
+  status          LeaveStatus     @default(PENDING)
+  approvalComment String?
+  approvedById    String?
+  approvedBy      User?           @relation("LeaveApprover", fields: [approvedById], references: [id])
+  approvedAt      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("leave_requests")
+}
+
+model Salary {
+  id            String          @id @default(uuid())
+  employeeId    String
+  employee      EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  basicSalary   Float
+  hra           Float
+  allowances    Float
+  deductions    Float
+  grossSalary   Float
+  netSalary     Float
+  effectiveFrom DateTime        @db.Date
+  effectiveTo   DateTime?       @db.Date
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@map("salaries")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("INFO")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model Document {
+  id          String          @id @default(uuid())
+  employeeId  String
+  employee    EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  title       String
+  fileName    String
+  fileType    String
+  filePath    String
+  uploadedAt  DateTime        @default(now())
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("documents")
+}
