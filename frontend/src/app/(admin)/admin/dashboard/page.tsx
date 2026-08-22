@@ -54,25 +54,25 @@ export default function AdminDashboardPage() {
   const absentCount = totalEmployees > 0 ? Math.max(0, totalEmployees - presentCount - leaveCount) : 0;
 
   const metricCards = [
-    { label: 'Total Employees', value: totalEmployees, icon: Users, color: 'text-purple-400', bg: 'bg-purple-950/60 border-purple-800/40' },
-    { label: 'Present Today', value: presentCount, icon: UserCheck, color: 'text-emerald-400', bg: 'bg-emerald-950/60 border-emerald-800/40' },
-    { label: 'Absent Today', value: absentCount, icon: UserX, color: 'text-rose-400', bg: 'bg-rose-950/60 border-rose-800/40' },
-    { label: 'On Leave', value: leaveCount, icon: CalendarDays, color: 'text-sky-400', bg: 'bg-sky-950/60 border-sky-800/40' },
-    { label: 'Pending Leave Requests', value: pendingRequests.length, icon: FileCheck, color: 'text-amber-400', bg: 'bg-amber-950/60 border-amber-800/40' },
+    { label: 'Total Employees', value: totalEmployees, icon: Users, color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/60 border-purple-100 dark:border-purple-800/40' },
+    { label: 'Present Today', value: presentCount, icon: UserCheck, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-100 dark:border-emerald-800/40' },
+    { label: 'Absent Today', value: absentCount, icon: UserX, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/60 border-rose-100 dark:border-rose-800/40' },
+    { label: 'On Leave', value: leaveCount, icon: CalendarDays, color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-950/60 border-sky-100 dark:border-sky-800/40' },
+    { label: 'Pending Leaves', value: pendingRequests.length, icon: FileCheck, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/60 border-amber-100 dark:border-amber-800/40' },
   ];
 
   return (
     <div className="space-y-6">
       {/* Top Welcome Card */}
-      <Card className="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800">
+      <Card className="bg-gradient-to-r from-slate-50 via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-purple-950 text-purple-400 rounded-xl border border-purple-800/50">
+            <div className="p-3 bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-450 rounded-xl border border-purple-100 dark:border-purple-800/50">
               <Shield className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-100">HR Executive Portal</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Real-time workforce operational monitoring and approvals.</p>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-850 dark:text-slate-100">HR Executive Portal</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Real-time workforce operational monitoring and approvals.</p>
             </div>
           </div>
 
@@ -84,21 +84,21 @@ export default function AdminDashboardPage() {
         </div>
       </Card>
 
-      {/* Metrics Row matching wireframe */}
+      {/* Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {metricCards.map((c) => {
           const Icon = c.icon;
           return (
-            <div key={c.label} className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between shadow-xs">
+            <div key={c.label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-805 rounded-2xl p-4 flex flex-col justify-between shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{c.label}</span>
-                <div className={`p-1.5 rounded-lg border ${c.bg} ${c.color}`}>
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{c.label}</span>
+                <div className={`p-1.5 rounded-xl border ${c.bg} ${c.color}`}>
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
 
               <div className="mt-3">
-                <p className="text-2xl font-extrabold text-slate-100 font-mono">{c.value}</p>
+                <p className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 font-mono">{c.value}</p>
               </div>
             </div>
           );
@@ -111,10 +111,10 @@ export default function AdminDashboardPage() {
         <Card className="lg:col-span-2 space-y-4">
           <CardHeader>
             <CardTitle className="text-sm flex items-center space-x-2">
-              <FileCheck className="w-4 h-4 text-purple-400" />
+              <FileCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               <span>Pending Leave Approvals ({pendingRequests.length})</span>
             </CardTitle>
-            <Link href="/admin/leave" className="text-xs text-purple-400 hover:underline">
+            <Link href="/admin/leave" className="text-xs text-purple-650 dark:text-purple-405 hover:underline">
               View All
             </Link>
           </CardHeader>
@@ -124,16 +124,16 @@ export default function AdminDashboardPage() {
               {pendingRequests.slice(0, 4).map((req) => (
                 <div
                   key={req.id}
-                  className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-colors"
+                  className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-850 flex items-center justify-between hover:border-purple-500/30 transition-all"
                 >
                   <div>
-                    <p className="text-xs font-semibold text-slate-100">
+                    <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">
                       {req.employee?.firstName} {req.employee?.lastName}
                     </p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                       {req.leaveType} Leave • {req.numberOfDays} Day(s) ({new Date(req.startDate).toLocaleDateString()} to {new Date(req.endDate).toLocaleDateString()})
                     </p>
-                    <p className="text-[11px] text-slate-500 italic mt-1 max-w-md truncate">"{req.reason}"</p>
+                    <p className="text-[11px] text-slate-450 dark:text-slate-500 italic mt-1 max-w-md truncate">"{req.reason}"</p>
                   </div>
 
                   <Button variant="primary" size="sm" onClick={() => setSelectedRequest(req)}>
@@ -143,7 +143,7 @@ export default function AdminDashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="text-xs text-slate-500 py-6 text-center">No pending leave applications requiring approval.</p>
+            <p className="text-xs text-slate-400 dark:text-slate-505 py-6 text-center">No pending leave applications.</p>
           )}
         </Card>
 
@@ -151,25 +151,25 @@ export default function AdminDashboardPage() {
         <Card className="space-y-4">
           <CardHeader>
             <CardTitle className="text-sm flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-purple-400" />
-              <span>Quick Administrative Links</span>
+              <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span>Administrative Links</span>
             </CardTitle>
           </CardHeader>
 
           <div className="space-y-2.5">
-            <Link href="/admin/employees" className="block p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs font-medium text-slate-200 hover:border-purple-500/40">
+            <Link href="/admin/employees" className="block p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-purple-500/40 hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all">
               👥 Employee Directory & Profiles
             </Link>
-            <Link href="/admin/attendance" className="block p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs font-medium text-slate-200 hover:border-purple-500/40">
+            <Link href="/admin/attendance" className="block p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-purple-500/40 hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all">
               📊 Master Attendance Hub
             </Link>
-            <Link href="/admin/leave" className="block p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs font-medium text-slate-200 hover:border-purple-500/40">
+            <Link href="/admin/leave" className="block p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-purple-500/40 hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all">
               ✅ Leave Request Approvals
             </Link>
-            <Link href="/admin/payroll" className="block p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs font-medium text-slate-200 hover:border-purple-500/40">
+            <Link href="/admin/payroll" className="block p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-purple-500/40 hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all">
               💳 Payroll & Compensation Management
             </Link>
-            <Link href="/admin/reports" className="block p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs font-medium text-slate-200 hover:border-purple-500/40">
+            <Link href="/admin/reports" className="block p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-purple-500/40 hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all">
               📈 HR Analytics & Operational Reports
             </Link>
           </div>

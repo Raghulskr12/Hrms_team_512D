@@ -33,7 +33,7 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
         <LoadingSpinner message="Authenticating session..." size="lg" />
       </div>
     );
@@ -56,7 +56,7 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   };
 
   return (
-    <div className="flex h-screen bg-slate-950 overflow-hidden text-slate-100">
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-200">
       <Sidebar
         mobileOpen={mobileSidebarOpen}
         onCloseMobile={() => setMobileSidebarOpen(false)}

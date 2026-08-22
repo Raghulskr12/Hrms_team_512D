@@ -15,14 +15,14 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center font-semibold transition-all rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variants = {
-    primary: 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm shadow-purple-900/20',
-    secondary: 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700',
-    outline: 'bg-transparent border border-slate-700 hover:bg-slate-800 text-slate-300',
-    danger: 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm shadow-rose-900/20',
-    ghost: 'bg-transparent hover:bg-slate-800 text-slate-400 hover:text-slate-200',
+    primary: 'bg-purple-600 hover:bg-purple-500 text-white shadow-sm shadow-purple-600/10',
+    secondary: 'bg-slate-100 dark:bg-slate-900 hover:bg-slate-250 dark:hover:bg-slate-850 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800',
+    outline: 'bg-transparent border border-slate-200 dark:border-slate-800 hover:bg-slate-100/50 dark:hover:bg-slate-900 text-slate-600 dark:text-slate-300',
+    danger: 'bg-rose-600 hover:bg-rose-500 text-white shadow-sm shadow-rose-600/10',
+    ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-250',
   };
 
   const sizes = {
