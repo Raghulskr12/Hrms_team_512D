@@ -18,4 +18,9 @@ export const profileService = {
     const res = await api.put<EmployeeProfile>('/profile', data);
     return res.data;
   },
+
+  changePassword: async (data: { currentPassword: string; newPassword: string }) => {
+    const res = await api.put('/auth/change-password', data);
+    return res.data;
+  },
 };

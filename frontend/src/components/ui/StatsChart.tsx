@@ -5,12 +5,7 @@ import React from 'react';
 /* ============================================================
    DONUT CHART
    ============================================================ */
-interface DonutSlice {
-  value: number;
-  color: string;
-  label: string;
-}
-
+interface DonutSlice { value: number; color: string; label: string; }
 interface DonutChartProps {
   slices: DonutSlice[];
   size?: number;
@@ -21,85 +16,49 @@ interface DonutChartProps {
 }
 
 export const DonutChart: React.FC<DonutChartProps> = ({
-  slices,
-  size = 160,
-  strokeWidth = 18,
-  centerLabel,
-  centerValue,
-  className = '',
+  slices, size = 160, strokeWidth = 18,
+  centerLabel, centerValue, className = '',
 }) => {
-  const total = slices.reduce((sum, s) => sum + s.value, 0);
+  const total = slices.reduce((s, sl) => s + sl.value, 0);
   const r = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * r;
-  const cx = size / 2;
-  const cy = size / 2;
-
+  const circ = 2 * Math.PI * r;
+  const cx = size / 2, cy = size / 2;
   let offset = 0;
-  const arcs = slices.map((slice) => {
-    const pct = total > 0 ? slice.value / total : 0;
-    const dash = pct * circumference;
-    const gap = circumference - dash;
+
+  const arcs = slices.map((sl) => {
+    const pct = total > 0 ? sl.value / total : 0;
+    const dash = pct * circ;
     const rotation = (offset / (total || 1)) * 360 - 90;
-    offset += slice.value;
-    return { ...slice, dash, gap, rotation, pct };
+    offset += sl.value;
+    return { ...sl, dash, gap: circ - dash, rotation };
   });
 
   return (
     <div className={`relative inline-flex items-center justify-center ${className}`}>
       <svg width={size} height={size} className="drop-shadow-md">
-        {/* Background ring */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={r}
-          fill="none"
-          stroke="rgba(30, 45, 74, 0.8)"
-          strokeWidth={strokeWidth}
-        />
-        {/* Slices */}
-        {total === 0 ? (
-          <circle
-            cx={cx}
-            cy={cy}
-            r={r}
-            fill="none"
-            stroke="rgba(99, 102, 241, 0.15)"
-            strokeWidth={strokeWidth}
-          />
-        ) : (
-          arcs.map((arc, i) => (
-            <circle
-              key={i}
-              cx={cx}
-              cy={cy}
-              r={r}
-              fill="none"
-              stroke={arc.color}
-              strokeWidth={strokeWidth}
-              strokeDasharray={`${arc.dash} ${arc.gap}`}
-              strokeDashoffset={0}
-              strokeLinecap="round"
-              transform={`rotate(${arc.rotation} ${cx} ${cy})`}
-              style={{
-                transition: 'stroke-dasharray 0.6s ease',
-                filter: `drop-shadow(0 0 4px ${arc.color}55)`,
-              }}
-            />
-          ))
-        )}
+        <circle cx={cx} cy={cy} r={r} fill="none"
+          stroke="var(--bg-elevated)" strokeWidth={strokeWidth}/>
+        {total === 0
+          ? <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--border)" strokeWidth={strokeWidth}/>
+          : arcs.map((arc, i) => (
+              <circle key={i} cx={cx} cy={cy} r={r} fill="none"
+                stroke={arc.color} strokeWidth={strokeWidth}
+                strokeDasharray={`${arc.dash} ${arc.gap}`}
+                strokeLinecap="round"
+                transform={`rotate(${arc.rotation} ${cx} ${cy})`}
+                style={{ transition: 'stroke-dasharray 0.6s ease', filter: `drop-shadow(0 0 4px ${arc.color}55)` }}
+              />
+            ))}
       </svg>
-      {/* Center text */}
       {(centerValue !== undefined || centerLabel) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           {centerValue !== undefined && (
-            <span className="text-2xl font-bold text-[#E8EDFF] font-mono leading-none">
-              {centerValue}
-            </span>
+            <span className="text-2xl font-bold font-mono leading-none"
+              style={{ color: 'var(--text-primary)' }}>{centerValue}</span>
           )}
           {centerLabel && (
-            <span className="text-[10px] text-[#64748B] font-medium mt-0.5 text-center leading-tight">
-              {centerLabel}
-            </span>
+            <span className="text-[10px] font-medium mt-0.5 text-center leading-tight"
+              style={{ color: 'var(--text-muted)' }}>{centerLabel}</span>
           )}
         </div>
       )}
@@ -107,30 +66,20 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   );
 };
 
-/* ============================================================
-   DONUT LEGEND
-   ============================================================ */
-interface DonutLegendProps {
-  slices: DonutSlice[];
-  total: number;
-}
-
-export const DonutLegend: React.FC<DonutLegendProps> = ({ slices, total }) => (
+export const DonutLegend: React.FC<{ slices: DonutSlice[]; total: number }> = ({ slices, total }) => (
   <div className="space-y-2">
-    {slices.map((slice, i) => {
-      const pct = total > 0 ? Math.round((slice.value / total) * 100) : 0;
+    {slices.map((sl, i) => {
+      const pct = total > 0 ? Math.round((sl.value / total) * 100) : 0;
       return (
         <div key={i} className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <div
-              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-              style={{ backgroundColor: slice.color, boxShadow: `0 0 6px ${slice.color}60` }}
-            />
-            <span className="text-[11px] text-[#94A3B8] truncate">{slice.label}</span>
+            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              style={{ background: sl.color, boxShadow: `0 0 6px ${sl.color}60` }}/>
+            <span className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>{sl.label}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-[#E8EDFF] font-mono">{slice.value}</span>
-            <span className="text-[10px] text-[#64748B] w-8 text-right">{pct}%</span>
+            <span className="text-[11px] font-bold font-mono" style={{ color: 'var(--text-primary)' }}>{sl.value}</span>
+            <span className="text-[10px] w-8 text-right" style={{ color: 'var(--text-muted)' }}>{pct}%</span>
           </div>
         </div>
       );
@@ -139,91 +88,96 @@ export const DonutLegend: React.FC<DonutLegendProps> = ({ slices, total }) => (
 );
 
 /* ============================================================
-   BAR CHART
+   IMPROVED BAR CHART — vertical bars with labels and grid
    ============================================================ */
-interface BarData {
-  label: string;
-  value: number;
-  color?: string;
-}
-
+interface BarData { label: string; value: number; color?: string; }
 interface BarChartProps {
   data: BarData[];
   height?: number;
-  showValues?: boolean;
   className?: string;
-  barColor?: string;
+  unit?: string;
 }
 
 export const BarChart: React.FC<BarChartProps> = ({
-  data,
-  height = 120,
-  showValues = true,
-  className = '',
-  barColor = '#6366F1',
+  data, height = 160, className = '', unit = '',
 }) => {
-  const maxValue = Math.max(...data.map((d) => d.value), 1);
-  const barWidth = 100 / (data.length * 2 - 1);
+  const maxVal = Math.max(...data.map((d) => d.value), 1);
+  const gridLines = 4;
 
   return (
     <div className={`w-full ${className}`}>
-      <svg width="100%" height={height} viewBox={`0 0 100 ${height}`} preserveAspectRatio="none">
-        {/* Grid lines */}
-        {[0.25, 0.5, 0.75, 1].map((frac, i) => (
-          <line
-            key={i}
-            x1="0"
-            y1={height - frac * height}
-            x2="100"
-            y2={height - frac * height}
-            stroke="rgba(30, 45, 74, 0.6)"
-            strokeWidth="0.5"
-          />
-        ))}
-        {/* Bars */}
-        {data.map((d, i) => {
-          const barH = (d.value / maxValue) * (height - 20);
-          const x = i * (barWidth * 2);
-          const color = d.color || barColor;
-          return (
-            <g key={i}>
-              <rect
-                x={`${x}%`}
-                y={height - barH - 4}
-                width={`${barWidth}%`}
-                height={barH}
-                rx="2"
-                fill={color}
-                opacity="0.85"
-                style={{ filter: `drop-shadow(0 0 4px ${color}55)` }}
+      <div className="flex gap-3 items-end" style={{ height }}>
+        {/* Y-axis labels */}
+        <div className="flex flex-col justify-between h-full pb-6 flex-shrink-0">
+          {Array.from({ length: gridLines + 1 }, (_, i) => (
+            <span key={i} className="text-[9px] font-mono text-right w-8"
+              style={{ color: 'var(--text-muted)' }}>
+              {Math.round((maxVal * (gridLines - i)) / gridLines)}{unit}
+            </span>
+          ))}
+        </div>
+
+        {/* Chart area */}
+        <div className="flex-1 relative flex flex-col">
+          {/* Grid lines */}
+          <div className="flex-1 relative">
+            {Array.from({ length: gridLines }, (_, i) => (
+              <div key={i}
+                className="absolute w-full border-dashed"
+                style={{
+                  top: `${(i / gridLines) * 100}%`,
+                  borderTop: '1px dashed var(--border)',
+                  opacity: 0.5,
+                }}
               />
-              {showValues && d.value > 0 && (
-                <text
-                  x={`${x + barWidth / 2}%`}
-                  y={height - barH - 7}
-                  textAnchor="middle"
-                  fill="#94A3B8"
-                  fontSize="5"
-                  fontFamily="JetBrains Mono, monospace"
-                >
-                  {d.value}
-                </text>
-              )}
-            </g>
-          );
-        })}
-      </svg>
-      {/* X-axis labels */}
-      <div className="flex w-full mt-1">
-        {data.map((d, i) => (
-          <div
-            key={i}
-            className="text-center text-[10px] text-[#64748B]"
-            style={{ width: `${100 / data.length}%` }}
-          >
-            {d.label}
+            ))}
+
+            {/* Bars */}
+            <div className="absolute inset-0 flex items-end gap-1.5 px-1">
+              {data.map((d, i) => {
+                const barH = maxVal > 0 ? (d.value / maxVal) * 100 : 0;
+                const color = d.color || 'var(--accent)';
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1 group">
+                    {/* Value label on hover */}
+                    <div className="text-[10px] font-bold font-mono opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ color }}>
+                      {d.value}{unit}
+                    </div>
+                    {/* Bar */}
+                    <div
+                      className="w-full rounded-t-lg transition-all duration-500 relative overflow-hidden"
+                      style={{
+                        height: `${barH}%`,
+                        minHeight: d.value > 0 ? 4 : 0,
+                        background: `linear-gradient(180deg, ${color}, ${color}99)`,
+                        boxShadow: `0 -2px 12px ${color}40`,
+                      }}
+                    >
+                      {/* Shimmer on hover */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity"
+                        style={{ background: 'linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%)', backgroundSize: '200% 100%' }}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        ))}
+
+          {/* X-axis baseline */}
+          <div className="h-px w-full" style={{ background: 'var(--border)' }}/>
+
+          {/* X-axis labels */}
+          <div className="flex gap-1.5 px-1 mt-2">
+            {data.map((d, i) => (
+              <div key={i} className="flex-1 text-center">
+                <span className="text-[9px] font-medium" style={{ color: 'var(--text-muted)' }}>
+                  {d.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -241,62 +195,32 @@ interface SparklineProps {
 }
 
 export const Sparkline: React.FC<SparklineProps> = ({
-  data,
-  width = 80,
-  height = 32,
-  color = '#6366F1',
-  className = '',
+  data, width = 80, height = 32, color = 'var(--accent)', className = '',
 }) => {
   if (data.length < 2) return null;
-
-  const max = Math.max(...data, 1);
-  const min = Math.min(...data);
-  const range = max - min || 1;
-
-  const points = data.map((v, i) => {
+  const max = Math.max(...data, 1), min = Math.min(...data), range = max - min || 1;
+  const pts = data.map((v, i) => {
     const x = (i / (data.length - 1)) * width;
     const y = height - ((v - min) / range) * (height - 4) - 2;
     return `${x},${y}`;
   });
-
-  const polyline = points.join(' ');
-
-  // Build filled area
-  const areaPoints = [
-    `0,${height}`,
-    ...points,
-    `${width},${height}`,
-  ].join(' ');
+  const areaPoints = [`0,${height}`, ...pts, `${width},${height}`].join(' ');
 
   return (
     <svg width={width} height={height} className={className}>
       <defs>
-        <linearGradient id={`sg-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+        <linearGradient id={`sg-${Math.random().toString(36).slice(2)}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.3"/>
+          <stop offset="100%" stopColor={color} stopOpacity="0.02"/>
         </linearGradient>
       </defs>
-      <polygon
-        points={areaPoints}
-        fill={`url(#sg-${color.replace('#', '')})`}
-      />
-      <polyline
-        points={polyline}
-        fill="none"
-        stroke={color}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        style={{ filter: `drop-shadow(0 0 3px ${color}88)` }}
-      />
-      {/* Last point dot */}
-      <circle
-        cx={(data.length - 1) / (data.length - 1) * width}
+      <polygon points={areaPoints} fill={`url(#sg-0)`}/>
+      <polyline points={pts.join(' ')} fill="none" stroke={color}
+        strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+        style={{ filter: `drop-shadow(0 0 3px ${color})` }}/>
+      <circle cx={(data.length - 1) / (data.length - 1) * width}
         cy={height - ((data[data.length - 1] - min) / range) * (height - 4) - 2}
-        r="2"
-        fill={color}
-        style={{ filter: `drop-shadow(0 0 4px ${color})` }}
-      />
+        r="2" fill={color}/>
     </svg>
   );
 };
@@ -309,46 +233,25 @@ interface ProgressBarProps {
   max: number;
   color?: string;
   height?: number;
-  showLabel?: boolean;
   className?: string;
 }
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
-  value,
-  max,
-  color = '#6366F1',
-  height = 6,
-  showLabel = false,
-  className = '',
+  value, max, color = 'var(--accent)', height = 6, className = '',
 }) => {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
   return (
     <div className={`w-full ${className}`}>
-      <div
-        className="w-full rounded-full overflow-hidden"
-        style={{ height, background: 'rgba(30, 45, 74, 0.8)' }}
-      >
-        <div
-          className="h-full rounded-full transition-all duration-700 ease-out"
-          style={{
-            width: `${pct}%`,
-            background: `linear-gradient(90deg, ${color}, ${color}cc)`,
-            boxShadow: `0 0 8px ${color}60`,
-          }}
-        />
+      <div className="w-full rounded-full overflow-hidden" style={{ height, background: 'var(--bg-elevated)' }}>
+        <div className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}, ${color}cc)`, boxShadow: `0 0 8px ${color}60` }}/>
       </div>
-      {showLabel && (
-        <div className="flex justify-between mt-1">
-          <span className="text-[10px] text-[#64748B]">{value} used</span>
-          <span className="text-[10px] text-[#64748B]">{max} total</span>
-        </div>
-      )}
     </div>
   );
 };
 
 /* ============================================================
-   METRIC CARD (inline widget)
+   METRIC CARD
    ============================================================ */
 interface MetricCardProps {
   label: string;
@@ -362,44 +265,28 @@ interface MetricCardProps {
 }
 
 export const MetricCard: React.FC<MetricCardProps> = ({
-  label,
-  value,
-  change,
-  changePositive,
-  icon,
-  color = '#6366F1',
-  sparkData,
-  className = '',
-}) => {
-  return (
-    <div
-      className={`bg-[#0F1629] border border-[#1E2D4A] rounded-2xl p-4 hover:border-indigo-500/30 transition-all duration-200 hover-lift ${className}`}
-    >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          {icon && (
-            <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center"
-              style={{ background: `${color}18`, border: `1px solid ${color}30` }}
-            >
-              <span style={{ color }}>{icon}</span>
-            </div>
-          )}
+  label, value, change, changePositive, icon, color = 'var(--accent)', sparkData, className = '',
+}) => (
+  <div
+    className={`rounded-2xl p-4 hover-lift transition-all duration-200 ${className}`}
+    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+  >
+    <div className="flex items-start justify-between mb-3">
+      {icon && (
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+          style={{ background: `${color}18`, border: `1px solid ${color}30`, color }}>
+          {icon}
         </div>
-        {sparkData && (
-          <Sparkline data={sparkData} width={60} height={28} color={color} />
-        )}
-      </div>
-
-      <div className="mt-1">
-        <p className="text-[10px] font-bold tracking-wider text-[#64748B] uppercase mb-1">{label}</p>
-        <p className="text-2xl font-extrabold text-[#E8EDFF] font-mono leading-none">{value}</p>
-        {change && (
-          <p className={`text-[10px] font-medium mt-1.5 ${changePositive ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {changePositive ? '▲' : '▼'} {change}
-          </p>
-        )}
-      </div>
+      )}
+      {sparkData && <Sparkline data={sparkData} width={60} height={28} color={color}/>}
     </div>
-  );
-};
+    <p className="text-[10px] font-bold tracking-wider uppercase mb-1" style={{ color: 'var(--text-muted)' }}>{label}</p>
+    <p className="text-2xl font-extrabold font-mono leading-none" style={{ color: 'var(--text-primary)' }}>{value}</p>
+    {change && (
+      <p className="text-[10px] font-medium mt-1.5"
+        style={{ color: changePositive ? 'var(--success)' : 'var(--danger)' }}>
+        {changePositive ? '▲' : '▼'} {change}
+      </p>
+    )}
+  </div>
+);

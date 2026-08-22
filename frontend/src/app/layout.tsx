@@ -6,17 +6,15 @@ import { ThemeProvider } from '../context/ThemeContext';
 export const metadata: Metadata = {
   title: 'NexusHR — Workforce Intelligence Platform',
   description: 'Your workforce, connected. Modern HR management for high-performing teams.',
-  keywords: 'HR, Human Resources, HRMS, Workforce Management, Attendance, Payroll',
+  keywords: 'HR, HRMS, Workforce, Attendance, Payroll, Leave Management',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-[#0A0E1A] text-[#E8EDFF] min-h-screen antialiased transition-colors duration-300 dark">
+      <body className="min-h-screen antialiased transition-colors duration-300" style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>

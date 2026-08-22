@@ -4,14 +4,17 @@ import React, { useState, useEffect } from 'react';
 import { attendanceService } from '../../../services/attendanceService';
 import { Attendance } from '../../../types';
 import { CheckInWidget } from '../../../components/attendance/CheckInWidget';
+import { AttendanceCalendar } from '../../../components/attendance/AttendanceCalendar';
+import { Card } from '../../../components/ui/Card';
 import { LoadingSpinner } from '../../../components/ui/LoadingSpinner';
-import { Clock, Info, Calendar as CalendarIcon } from 'lucide-react';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../../components/ui/Table';
+import { ProgressBar } from '../../../components/ui/StatsChart';
+import { Clock, AlertCircle, CalendarDays, TrendingUp } from 'lucide-react';
 
 export default function EmployeeAttendancePage() {
   const [todayAttendance, setTodayAttendance] = useState<Attendance | null>(null);
   const [history, setHistory] = useState<Attendance[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<'calendar' | 'list'>('calendar');
 
   const fetchData = async () => {
     try {
@@ -20,97 +23,174 @@ export default function EmployeeAttendancePage() {
         attendanceService.getToday(),
         attendanceService.getMyHistory(),
       ]);
-
       setTodayAttendance(todayRes || null);
       setHistory(historyRes || []);
     } catch (e) {
-      console.error('Error fetching attendance data:', e);
+      console.error('Error:', e);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
+
+  // Summary stats
+  const presentDays  = history.filter((r) => r.status === 'PRESENT').length;
+  const absentDays   = history.filter((r) => r.status === 'ABSENT').length;
+  const leaveDays    = history.filter((r) => r.status === 'LEAVE').length;
+  const halfDays     = history.filter((r) => r.status === 'HALF_DAY').length;
+  const totalLogged  = history.length;
+  const attendancePct = totalLogged > 0 ? Math.round((presentDays / totalLogged) * 100) : 0;
+
+  const statCards = [
+    { label: 'Present',  value: presentDays,  color: 'var(--success)',  bg: 'rgba(16,185,129,0.1)' },
+    { label: 'Absent',   value: absentDays,   color: 'var(--danger)',   bg: 'rgba(244,63,94,0.1)' },
+    { label: 'On Leave', value: leaveDays,    color: 'var(--violet)',   bg: 'rgba(139,92,246,0.1)' },
+    { label: 'Half Day', value: halfDays,     color: 'var(--warning)',  bg: 'rgba(245,158,11,0.1)' },
+  ];
+
+  if (loading) return <LoadingSpinner message="Loading attendance..." size="lg"/>;
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center">
-            <Clock className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" />
-            Attendance
-          </h2>
-          <p className="text-sm text-slate-500 mt-1">Manage and track your daily work hours.</p>
-        </div>
-      </div>
-
-      {/* Live Punch Widget */}
-      <CheckInWidget todayAttendance={todayAttendance} onRefresh={fetchData} />
-
-      {/* Note Section */}
-      <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-xl p-4 flex items-start space-x-3">
-        <Info className="w-5 h-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
-        <div>
-          <h4 className="text-sm font-bold text-amber-800 dark:text-amber-400">NOTE</h4>
-          <p className="text-xs text-amber-700 dark:text-amber-500/80 mt-1 leading-relaxed">
-            Please ensure you check in and check out promptly to accurately record your working hours.
-            Overtime hours must be pre-approved by your manager. Contact HR for any discrepancies in your logs.
-          </p>
-        </div>
-      </div>
-
-      {/* History Table */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center">
-          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Attendance Log</h3>
-          <div className="flex items-center space-x-2 text-xs font-semibold text-slate-500 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
-            <CalendarIcon className="w-3.5 h-3.5 mr-1" />
-            This Month
+    <div className="space-y-6 animate-fade-in">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg,var(--accent),#60A5FA)', boxShadow: '0 0 16px var(--accent-glow)' }}>
+            <Clock className="w-5 h-5 text-white"/>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>My Attendance</h2>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Track your daily work hours and history</p>
           </div>
         </div>
+        {/* View Toggle */}
+        <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+          <button
+            onClick={() => setView('calendar')}
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all"
+            style={view === 'calendar'
+              ? { background: 'var(--accent)', color: '#fff', boxShadow: '0 0 10px var(--accent-glow)' }
+              : { color: 'var(--text-muted)', background: 'transparent' }}
+          >
+            <CalendarDays className="w-3.5 h-3.5 inline mr-1"/>Calendar
+          </button>
+          <button
+            onClick={() => setView('list')}
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all"
+            style={view === 'list'
+              ? { background: 'var(--accent)', color: '#fff', boxShadow: '0 0 10px var(--accent-glow)' }
+              : { color: 'var(--text-muted)', background: 'transparent' }}
+          >
+            <TrendingUp className="w-3.5 h-3.5 inline mr-1"/>Log
+          </button>
+        </div>
+      </div>
 
-        {loading ? (
-          <div className="p-8 flex justify-center"><LoadingSpinner message="Loading attendance logs..." /></div>
-        ) : history.length > 0 ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Check In</TableHead>
-                <TableHead>Check Out</TableHead>
-                <TableHead>Work Hours</TableHead>
-                <TableHead>Extra Hours</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {history.map((record) => {
-                const date = new Date(record.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-                const checkIn = record.checkIn ? new Date(record.checkIn).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '--:--';
-                const checkOut = record.checkOut ? new Date(record.checkOut).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '--:--';
-                
-                // Mocking hours for UI showcase
-                const workHours = record.checkOut ? '8h 15m' : '--';
-                const extraHours = record.checkOut ? '15m' : '--';
+      {/* Check-in Widget */}
+      <CheckInWidget todayAttendance={todayAttendance} onRefresh={fetchData}/>
+
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {statCards.map((s, i) => (
+          <Card key={i} className="text-center">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2"
+              style={{ background: s.bg }}>
+              <span className="text-xl font-black font-mono" style={{ color: s.color }}>{s.value}</span>
+            </div>
+            <p className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+          </Card>
+        ))}
+      </div>
+
+      {/* Attendance Rate */}
+      <Card>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>Overall Attendance Rate</span>
+          <span className="text-sm font-black font-mono" style={{ color: 'var(--success)' }}>{attendancePct}%</span>
+        </div>
+        <ProgressBar value={presentDays} max={totalLogged || 1} color="var(--success)" height={8}/>
+        <p className="text-[10px] mt-2" style={{ color: 'var(--text-muted)' }}>
+          {presentDays} present out of {totalLogged} recorded days
+        </p>
+      </Card>
+
+      {/* Calendar / List View */}
+      {view === 'calendar' ? (
+        <AttendanceCalendar records={history} className="w-full"/>
+      ) : (
+        <Card>
+          <div className="flex items-center gap-2 mb-4"
+            style={{ borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+            <TrendingUp className="w-4 h-4" style={{ color: 'var(--accent)' }}/>
+            <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Attendance Log</h3>
+          </div>
+
+          {history.length > 0 ? (
+            <div className="space-y-2">
+              {history.map((rec) => {
+                const checkIn  = rec.checkIn  ? new Date(rec.checkIn).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
+                const checkOut = rec.checkOut ? new Date(rec.checkOut).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
+                const statusColor = rec.status === 'PRESENT' ? 'var(--success)'
+                  : rec.status === 'ABSENT' ? 'var(--danger)'
+                  : rec.status === 'HALF_DAY' ? 'var(--warning)'
+                  : 'var(--violet)';
 
                 return (
-                  <TableRow key={record.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <TableCell className="font-medium text-slate-900 dark:text-slate-100 py-4">{date}</TableCell>
-                    <TableCell className="text-emerald-600 dark:text-emerald-400 font-medium">{checkIn}</TableCell>
-                    <TableCell className="text-rose-600 dark:text-rose-400 font-medium">{checkOut}</TableCell>
-                    <TableCell className="font-mono text-slate-600 dark:text-slate-300">{workHours}</TableCell>
-                    <TableCell className="font-mono text-purple-600 dark:text-purple-400">{extraHours}</TableCell>
-                  </TableRow>
+                  <div key={rec.id}
+                    className="flex items-center justify-between p-3 rounded-xl transition-all"
+                    style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent-glow)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full" style={{ background: statusColor, boxShadow: `0 0 6px ${statusColor}` }}/>
+                      <div>
+                        <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
+                          {new Date(rec.date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}
+                        </p>
+                        <p className="text-[10px] font-mono mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                          {checkIn} → {checkOut}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {rec.workedHours != null && (
+                        <span className="text-xs font-bold font-mono" style={{ color: 'var(--accent)' }}>
+                          {rec.workedHours}h
+                        </span>
+                      )}
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                        style={{ background: `${statusColor}18`, color: statusColor, border: `1px solid ${statusColor}30` }}>
+                        {rec.status}
+                      </span>
+                    </div>
+                  </div>
                 );
               })}
-            </TableBody>
-          </Table>
-        ) : (
-          <div className="p-12 text-center text-slate-500">
-            No attendance records found for this period.
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <Clock className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--border)' }}/>
+              <p className="text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>No records yet</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>Clock in to start tracking</p>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Info note */}
+      <div className="flex items-start gap-3 p-4 rounded-xl"
+        style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)' }}>
+        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--warning)' }}/>
+        <div>
+          <p className="text-xs font-bold" style={{ color: 'var(--warning)' }}>Reminder</p>
+          <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            Please check in and out promptly to accurately record your working hours.
+            Overtime requires manager approval. Contact HR for any attendance discrepancies.
+          </p>
+        </div>
       </div>
     </div>
   );

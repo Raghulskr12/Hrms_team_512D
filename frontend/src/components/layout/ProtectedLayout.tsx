@@ -13,27 +13,21 @@ interface ProtectedLayoutProps {
 }
 
 export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
-  children,
-  requireAdminOrHR = false,
+  children, requireAdminOrHR = false,
 }) => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading) {
-      if (!user) {
-        router.push('/login');
-      } else if (requireAdminOrHR && user.role !== 'ADMIN' && user.role !== 'HR') {
-        router.push('/dashboard');
-      }
+      if (!user) router.push('/login');
+      else if (requireAdminOrHR && user.role !== 'ADMIN' && user.role !== 'HR') router.push('/dashboard');
     }
   }, [user, loading, router, requireAdminOrHR]);
 
-  if (loading || !user) {
-    return <LoadingSpinner message="Authenticating session..." size="lg" />;
-  }
+  if (loading || !user) return <LoadingSpinner message="Authenticating session..." size="lg"/>;
 
   const getPageTitle = (path: string) => {
     if (path.includes('/admin/employees')) return 'Employee Directory';
@@ -51,27 +45,11 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   };
 
   return (
-    <div
-      className="flex h-screen overflow-hidden"
-      style={{ background: '#0A0E1A' }}
-    >
-      <Sidebar
-        mobileOpen={mobileSidebarOpen}
-        onCloseMobile={() => setMobileSidebarOpen(false)}
-      />
-
+    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg-base)' }}>
+      <Sidebar mobileOpen={mobileSidebarOpen} onCloseMobile={() => setMobileSidebarOpen(false)}/>
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header
-          title={getPageTitle(pathname)}
-          onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
-        />
-
-        <main
-          className="flex-1 overflow-y-auto"
-          style={{
-            background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99,102,241,0.04) 0%, transparent 60%), #0A0E1A',
-          }}
-        >
+        <Header title={getPageTitle(pathname)} onOpenMobileSidebar={() => setMobileSidebarOpen(true)}/>
+        <main className="flex-1 overflow-y-auto" style={{ background: 'var(--bg-base)' }}>
           <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto">
             {children}
           </div>
