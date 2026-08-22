@@ -1,6 +1,5 @@
 import React from 'react';
 import { LeaveRequest } from '../../types';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../ui/Table';
 import { Badge } from '../ui/Badge';
 import { EmptyState } from '../ui/EmptyState';
 
@@ -9,48 +8,55 @@ export const LeaveHistoryTable: React.FC<{ requests: LeaveRequest[] }> = ({ requ
     return <EmptyState title="No leave applications" description="You have not submitted any leave requests yet." />;
   }
 
+  const statusVariant = (status: string) =>
+    status === 'APPROVED' ? 'success' as const :
+    status === 'REJECTED' ? 'danger' as const : 'warning' as const;
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Type</TableHead>
-          <TableHead>Dates</TableHead>
-          <TableHead>Days</TableHead>
-          <TableHead>Reason</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Approver Remarks</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {requests.map((req) => (
-          <TableRow key={req.id}>
-            <TableCell className="font-semibold text-slate-200">{req.leaveType}</TableCell>
-            <TableCell className="font-mono text-xs text-slate-300">
-              {new Date(req.startDate).toLocaleDateString()} — {new Date(req.endDate).toLocaleDateString()}
-            </TableCell>
-            <TableCell className="font-mono text-xs font-semibold text-purple-400">
-              {req.numberOfDays} Day(s)
-            </TableCell>
-            <TableCell className="text-xs text-slate-300 max-w-xs truncate">{req.reason}</TableCell>
-            <TableCell>
-              <Badge
-                variant={
-                  req.status === 'APPROVED'
-                    ? 'success'
-                    : req.status === 'REJECTED'
-                    ? 'danger'
-                    : 'warning'
-                }
+    <div className="overflow-x-auto">
+      <table className="w-full text-xs">
+        <thead>
+          <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-elevated)' }}>
+            {['Type', 'Dates', 'Days', 'Reason', 'Status', 'Approver Remarks'].map((h) => (
+              <th
+                key={h}
+                className="px-4 py-3 text-left font-semibold uppercase tracking-wider"
+                style={{ color: 'var(--text-muted)', fontSize: 10 }}
               >
-                {req.status}
-              </Badge>
-            </TableCell>
-            <TableCell className="text-xs text-slate-400 italic">
-              {req.approvalComment || '-'}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map((req, i) => (
+            <tr
+              key={req.id}
+              className="nx-table-row transition-all"
+              style={{ borderBottom: i < requests.length - 1 ? '1px solid var(--border-muted)' : 'none' }}
+            >
+              <td className="px-4 py-3 font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {req.leaveType}
+              </td>
+              <td className="px-4 py-3 font-mono" style={{ color: 'var(--text-secondary)' }}>
+                {new Date(req.startDate).toLocaleDateString()} — {new Date(req.endDate).toLocaleDateString()}
+              </td>
+              <td className="px-4 py-3 font-mono font-bold" style={{ color: 'var(--accent)' }}>
+                {req.numberOfDays} Day(s)
+              </td>
+              <td className="px-4 py-3 max-w-xs truncate" style={{ color: 'var(--text-muted)' }}>
+                {req.reason}
+              </td>
+              <td className="px-4 py-3">
+                <Badge variant={statusVariant(req.status)}>{req.status}</Badge>
+              </td>
+              <td className="px-4 py-3 italic" style={{ color: 'var(--text-muted)' }}>
+                {req.approvalComment || '-'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };

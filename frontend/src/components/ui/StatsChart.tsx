@@ -96,6 +96,7 @@ interface BarChartProps {
   height?: number;
   className?: string;
   unit?: string;
+  showValues?: boolean;
 }
 
 export const BarChart: React.FC<BarChartProps> = ({

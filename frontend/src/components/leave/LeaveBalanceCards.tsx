@@ -1,6 +1,7 @@
 import React from 'react';
 import { LeaveBalance } from '../../types';
 import { Calendar, Stethoscope, Palmtree, GraduationCap, Heart, Clock } from 'lucide-react';
+import { ProgressBar } from '../ui/StatsChart';
 
 interface LeaveBalanceCardsProps {
   balances: LeaveBalance[];
@@ -18,40 +19,43 @@ export const LeaveBalanceCards: React.FC<LeaveBalanceCardsProps> = ({ balances }
     }
   };
 
+  const colors = ['var(--accent)', 'var(--info)', 'var(--success)', 'var(--warning)', 'var(--violet)'];
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-      {balances.map((bal) => {
+      {balances.map((bal, i) => {
         const Icon = getIcon(bal.leaveType);
-        const percent = bal.totalDays > 0 ? Math.round((bal.remainingDays / bal.totalDays) * 100) : 0;
+        const color = colors[i % colors.length];
 
         return (
           <div
             key={bal.id}
-            className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-between shadow-xs hover:border-slate-700 transition-all"
+            className="rounded-2xl p-4 flex flex-col justify-between transition-all hover-lift"
+            style={{
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
+            }}
           >
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: 'var(--text-muted)' }}>
                 {bal.leaveType}
               </span>
-              <div className="p-1.5 bg-purple-950/60 text-purple-400 rounded-lg border border-purple-800/40">
-                <Icon className="w-4 h-4" />
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{ background: `${color}18`, border: `1px solid ${color}30`, color }}
+              >
+                <Icon className="w-3.5 h-3.5" />
               </div>
             </div>
 
             <div className="my-2">
-              <div className="text-2xl font-bold text-slate-100 font-mono">
-                {bal.remainingDays} <span className="text-xs text-slate-500 font-sans font-normal">/ {bal.totalDays} Days</span>
+              <div className="text-xl font-bold font-mono" style={{ color: 'var(--text-primary)' }}>
+                {bal.remainingDays} <span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>/ {bal.totalDays} Days</span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-0.5">{bal.usedDays} days used</p>
+              <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{bal.usedDays} days used</p>
             </div>
 
-            {/* Progress bar */}
-            <div className="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-850">
-              <div
-                className="bg-gradient-to-r from-purple-600 to-indigo-500 h-1.5 rounded-full transition-all duration-300"
-                style={{ width: `${percent}%` }}
-              />
-            </div>
+            <ProgressBar value={bal.remainingDays} max={bal.totalDays || 1} color={color} height={4} />
           </div>
         );
       })}

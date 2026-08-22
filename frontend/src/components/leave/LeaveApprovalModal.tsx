@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { LeaveRequest } from '../../types';
 import { leaveService } from '../../services/leaveService';
 import { Modal } from '../ui/Modal';
-import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
@@ -64,47 +63,56 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title="Review Leave Request" maxWidth="md">
       <div className="space-y-4 text-sm">
         {error && (
-          <div className="p-3 bg-rose-950/80 border border-rose-800 text-rose-300 text-xs rounded-lg">
-            {error}
+          <div
+            className="p-3 text-xs font-medium rounded-xl"
+            style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)', color: 'var(--danger)' }}
+          >
+            ⚠ {error}
           </div>
         )}
 
-        <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+        <div
+          className="p-4 rounded-xl space-y-3"
+          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}
+        >
           <div className="flex justify-between items-start">
             <div>
-              <p className="font-semibold text-slate-100">
+              <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
                 {request.employee?.firstName} {request.employee?.lastName}
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                 {request.employee?.designation} • {request.employee?.department}
               </p>
             </div>
-            <Badge variant="purple">{request.leaveType}</Badge>
+            <Badge variant="indigo">{request.leaveType}</Badge>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-850">
+          <div className="grid grid-cols-2 gap-3 text-xs pt-2" style={{ borderTop: '1px solid var(--border)' }}>
             <div>
-              <span className="text-slate-500">Date Duration</span>
-              <p className="font-mono text-slate-200 font-medium">
+              <span style={{ color: 'var(--text-muted)' }}>Date Duration</span>
+              <p className="font-mono font-medium mt-0.5" style={{ color: 'var(--text-primary)' }}>
                 {new Date(request.startDate).toLocaleDateString()} — {new Date(request.endDate).toLocaleDateString()}
               </p>
             </div>
             <div>
-              <span className="text-slate-500">Total Working Days</span>
-              <p className="font-mono text-purple-400 font-bold">{request.numberOfDays} Day(s)</p>
+              <span style={{ color: 'var(--text-muted)' }}>Total Working Days</span>
+              <p className="font-mono font-bold mt-0.5" style={{ color: 'var(--accent)' }}>{request.numberOfDays} Day(s)</p>
             </div>
           </div>
 
           <div>
-            <span className="text-xs text-slate-500">Employee Reason</span>
-            <p className="text-xs text-slate-300 bg-slate-900 p-2.5 rounded-lg border border-slate-800 mt-1">
+            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Employee Reason</span>
+            <p
+              className="text-xs italic p-2.5 rounded-lg mt-1"
+              style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+            >
               "{request.reason}"
             </p>
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-medium text-slate-300">
+          <label className="block text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
             HR Approver Remarks / Rejection Reason
           </label>
           <textarea
@@ -112,30 +120,35 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
             onChange={(e) => setComment(e.target.value)}
             rows={3}
             placeholder="Add comments or rejection explanation..."
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500"
+            className="w-full px-3.5 py-2.5 rounded-xl text-xs transition-all focus:outline-none"
+            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-glow-sm)'; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
           />
         </div>
 
-        <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
-          <Button
-            variant="danger"
+        <div className="flex items-center justify-end gap-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
+          <button
+            type="button"
             onClick={handleReject}
-            isLoading={loadingReject}
-            disabled={loadingApprove}
+            disabled={loadingApprove || loadingReject}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all hover:-translate-y-0.5 disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,var(--danger),#E11D48)', boxShadow: '0 4px 15px rgba(244,63,94,0.35)' }}
           >
-            <XCircle className="w-4 h-4 mr-1.5" />
-            Reject Request
-          </Button>
+            <XCircle className="w-4 h-4" />
+            {loadingReject ? 'Rejecting...' : 'Reject Request'}
+          </button>
 
-          <Button
-            variant="primary"
+          <button
+            type="button"
             onClick={handleApprove}
-            isLoading={loadingApprove}
-            disabled={loadingReject}
+            disabled={loadingApprove || loadingReject}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all hover:-translate-y-0.5 disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,var(--accent),#60A5FA)', boxShadow: '0 4px 15px var(--accent-glow)' }}
           >
-            <CheckCircle2 className="w-4 h-4 mr-1.5" />
-            Approve Request
-          </Button>
+            <CheckCircle2 className="w-4 h-4" />
+            {loadingApprove ? 'Approving...' : 'Approve Request'}
+          </button>
         </div>
       </div>
     </Modal>

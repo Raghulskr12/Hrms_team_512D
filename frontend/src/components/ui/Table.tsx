@@ -1,19 +1,25 @@
 import React from 'react';
 
 export const Table: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className="w-full overflow-x-auto border border-slate-800 rounded-xl bg-slate-900/60">
+  <div
+    className="w-full overflow-x-auto rounded-2xl overflow-hidden"
+    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+  >
     <table className={`w-full text-left border-collapse ${className}`}>{children}</table>
   </div>
 );
 
 export const TableHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <thead className="bg-slate-950/80 border-b border-slate-800 text-xs font-semibold uppercase tracking-wider text-slate-400">
+  <thead
+    className="text-xs font-semibold uppercase tracking-wider"
+    style={{ background: 'var(--bg-elevated)', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}
+  >
     {children}
   </thead>
 );
 
 export const TableBody: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <tbody className="divide-y divide-slate-800/60 text-sm text-slate-300">{children}</tbody>
+  <tbody className="text-sm" style={{ color: 'var(--text-primary)' }}>{children}</tbody>
 );
 
 export const TableRow: React.FC<{ children: React.ReactNode; className?: string; onClick?: () => void }> = ({
@@ -23,16 +29,17 @@ export const TableRow: React.FC<{ children: React.ReactNode; className?: string;
 }) => (
   <tr
     onClick={onClick}
-    className={`transition-colors hover:bg-slate-800/40 ${onClick ? 'cursor-pointer' : ''} ${className}`}
+    className={`nx-table-row transition-colors ${onClick ? 'cursor-pointer' : ''} ${className}`}
+    style={{ borderBottom: '1px solid var(--border-muted)' }}
   >
     {children}
   </tr>
 );
 
 export const TableHead: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <th className={`px-4 py-3.5 font-semibold text-slate-300 ${className}`}>{children}</th>
+  <th className={`px-4 py-3.5 font-semibold ${className}`} style={{ color: 'var(--text-muted)', fontSize: 11 }}>{children}</th>
 );
 
 export const TableCell: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <th className={`px-4 py-3.5 font-normal text-slate-300 ${className}`}>{children}</th>
+  <td className={`px-4 py-3.5 ${className}`}>{children}</td>
 );

@@ -6,7 +6,6 @@ import { leaveService } from '../../services/leaveService';
 import { Modal } from '../ui/Modal';
 import { Select } from '../ui/Select';
 import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
 
 interface ApplyLeaveModalProps {
   isOpen: boolean;
@@ -77,8 +76,11 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClos
     <Modal isOpen={isOpen} onClose={onClose} title="Apply for Leave" maxWidth="md">
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="p-3 bg-rose-950/80 border border-rose-800 text-rose-300 text-xs rounded-lg">
-            {error}
+          <div
+            className="p-3 text-xs font-medium rounded-xl"
+            style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)', color: 'var(--danger)' }}
+          >
+            ⚠ {error}
           </div>
         )}
 
@@ -115,31 +117,48 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClos
         </div>
 
         {calculatedDays > 0 && (
-          <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
-            <span className="text-slate-400">Total Working Days</span>
-            <span className="font-bold text-purple-400 font-mono text-sm">{calculatedDays} Day(s)</span>
+          <div
+            className="p-3 rounded-xl flex justify-between items-center text-xs font-medium"
+            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}
+          >
+            <span style={{ color: 'var(--text-muted)' }}>Total Working Days</span>
+            <span className="font-bold font-mono text-sm" style={{ color: 'var(--accent)' }}>{calculatedDays} Day(s)</span>
           </div>
         )}
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-medium text-slate-300">Reason / Remarks</label>
+          <label className="block text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>Reason / Remarks</label>
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={3}
             placeholder="State the reason for taking leave..."
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500"
+            className="w-full px-3.5 py-2.5 rounded-xl text-xs transition-all focus:outline-none"
+            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-glow-sm)'; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
             required
           />
         </div>
 
-        <div className="flex justify-end space-x-3 pt-2">
-          <Button variant="secondary" type="button" onClick={onClose} disabled={loading}>
+        <div className="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="px-4 py-2.5 text-xs font-semibold rounded-xl transition-all"
+            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
+          >
             Cancel
-          </Button>
-          <Button variant="primary" type="submit" isLoading={loading}>
-            Submit Request
-          </Button>
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-5 py-2.5 text-xs font-bold rounded-xl text-white transition-all hover:-translate-y-0.5 disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,var(--accent),#60A5FA)', boxShadow: '0 4px 15px var(--accent-glow)' }}
+          >
+            {loading ? 'Submitting...' : 'Submit Request'}
+          </button>
         </div>
       </form>
     </Modal>

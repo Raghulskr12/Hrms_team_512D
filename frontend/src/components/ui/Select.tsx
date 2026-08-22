@@ -18,25 +18,40 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label htmlFor={selectId} className="block text-xs font-medium text-slate-300">
+          <label htmlFor={selectId} className="block text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
             {label}
           </label>
         )}
         <select
           id={selectId}
           ref={ref}
-          className={`w-full px-3 py-2 bg-slate-900/80 border text-slate-100 rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${
-            error ? 'border-rose-500 focus:border-rose-500' : 'border-slate-800 focus:border-purple-500'
-          } ${className}`}
+          className={`w-full px-3.5 py-2.5 rounded-xl text-xs transition-all focus:outline-none ${className}`}
+          style={{
+            background: 'var(--bg-elevated)',
+            border: error ? '1px solid var(--danger)' : '1px solid var(--border)',
+            color: 'var(--text-primary)',
+          }}
+          onFocus={(e) => {
+            if (!error) {
+              e.currentTarget.style.borderColor = 'var(--accent)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-glow-sm)';
+            }
+          }}
+          onBlur={(e) => {
+            if (!error) {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }
+          }}
           {...props}
         >
           {options.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-slate-900 text-slate-200">
+            <option key={opt.value} value={opt.value} style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}>
               {opt.label}
             </option>
           ))}
         </select>
-        {error && <p className="text-xs text-rose-400 font-medium">{error}</p>}
+        {error && <p className="text-xs font-medium" style={{ color: 'var(--danger)' }}>{error}</p>}
       </div>
     );
   }
