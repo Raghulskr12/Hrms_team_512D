@@ -13,20 +13,36 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-semibold text-slate-600 dark:text-slate-300">
+          <label htmlFor={inputId} className="block text-xs font-semibold text-[#94A3B8]">
             {label}
           </label>
         )}
         <input
           id={inputId}
           ref={ref}
-          className={`w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border text-slate-850 dark:text-slate-100 placeholder-slate-405 dark:placeholder-slate-500 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-purple-500/20 ${
-            error ? 'border-rose-450 dark:border-rose-500 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800/80 focus:border-purple-500 dark:focus:border-purple-500'
-          } ${className}`}
+          className={`w-full px-4 py-2.5 text-sm text-[#E8EDFF] placeholder-[#374151] rounded-xl transition-all focus:outline-none ${className}`}
+          style={{
+            background: 'rgba(15, 22, 41, 0.8)',
+            border: error ? '1px solid rgba(244, 63, 94, 0.5)' : '1px solid rgba(30, 45, 74, 0.9)',
+          }}
+          onFocus={(e) => {
+            if (!error) {
+              e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.6)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
+            }
+            props.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            if (!error) {
+              e.currentTarget.style.borderColor = 'rgba(30, 45, 74, 0.9)';
+              e.currentTarget.style.boxShadow = 'none';
+            }
+            props.onBlur?.(e);
+          }}
           {...props}
         />
-        {error && <p className="text-xs text-rose-500 dark:text-rose-400 font-medium">{error}</p>}
-        {helperText && !error && <p className="text-xs text-slate-400 dark:text-slate-500">{helperText}</p>}
+        {error && <p className="text-xs font-medium" style={{ color: '#F43F5E' }}>{error}</p>}
+        {helperText && !error && <p className="text-xs" style={{ color: '#64748B' }}>{helperText}</p>}
       </div>
     );
   }

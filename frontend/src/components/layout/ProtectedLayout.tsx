@@ -32,31 +32,29 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   }, [user, loading, router, requireAdminOrHR]);
 
   if (loading || !user) {
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-200">
-        <LoadingSpinner message="Authenticating session..." size="lg" />
-      </div>
-    );
+    return <LoadingSpinner message="Authenticating session..." size="lg" />;
   }
 
-  // Derive human title from pathname
   const getPageTitle = (path: string) => {
     if (path.includes('/admin/employees')) return 'Employee Directory';
-    if (path.includes('/admin/attendance')) return 'Master Attendance Hub';
+    if (path.includes('/admin/attendance')) return 'Attendance Hub';
     if (path.includes('/admin/leave')) return 'Leave Approvals';
     if (path.includes('/admin/payroll')) return 'Payroll Management';
-    if (path.includes('/admin/reports')) return 'HR Analytics & Reports';
-    if (path.includes('/admin/dashboard')) return 'HR Executive Dashboard';
-    if (path.includes('/profile')) return 'My Employee Profile';
+    if (path.includes('/admin/reports')) return 'Analytics & Reports';
+    if (path.includes('/admin/dashboard')) return 'HR Dashboard';
+    if (path.includes('/profile')) return 'My Profile';
     if (path.includes('/attendance')) return 'My Attendance';
-    if (path.includes('/leave')) return 'My Leave Management';
-    if (path.includes('/salary')) return 'My Salary Breakdown';
-    if (path.includes('/notifications')) return 'Notifications Center';
+    if (path.includes('/leave')) return 'Time Off Management';
+    if (path.includes('/salary')) return 'Salary & Compensation';
+    if (path.includes('/notifications')) return 'Notifications';
     return 'Dashboard';
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-200">
+    <div
+      className="flex h-screen overflow-hidden"
+      style={{ background: '#0A0E1A' }}
+    >
       <Sidebar
         mobileOpen={mobileSidebarOpen}
         onCloseMobile={() => setMobileSidebarOpen(false)}
@@ -68,8 +66,15 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
-          {children}
+        <main
+          className="flex-1 overflow-y-auto"
+          style={{
+            background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99,102,241,0.04) 0%, transparent 60%), #0A0E1A',
+          }}
+        >
+          <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>

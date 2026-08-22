@@ -4,8 +4,9 @@ import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 
 export const metadata: Metadata = {
-  title: 'Dayflow — Human Resource Management System',
-  description: 'Every workday, perfectly aligned.',
+  title: 'NexusHR — Workforce Intelligence Platform',
+  description: 'Your workforce, connected. Modern HR management for high-performing teams.',
+  keywords: 'HR, Human Resources, HRMS, Workforce Management, Attendance, Payroll',
 };
 
 export default function RootLayout({
@@ -14,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="bg-slate-50 dark:bg-slate-950 text-slate-950 dark:text-slate-50 min-h-screen antialiased transition-colors duration-200">
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-[#0A0E1A] text-[#E8EDFF] min-h-screen antialiased transition-colors duration-300 dark">
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
