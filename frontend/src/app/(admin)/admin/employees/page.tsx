@@ -31,8 +31,8 @@ export default function AdminEmployeesPage() {
         department: departmentFilter,
       });
 
-      setEmployees(res.employees || []);
-      setTotal(res.total || 0);
+      setEmployees(res?.employees || []);
+      setTotal(res?.total || 0);
     } catch (e) {
       console.error('Error fetching employees:', e);
     } finally {

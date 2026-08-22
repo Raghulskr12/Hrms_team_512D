@@ -58,7 +58,7 @@ export const ProfileBankTab: React.FC<ProfileBankTabProps> = ({ employeeProfileI
       setSaving(true);
       setError('');
       const updated = await employeeService.updateBankDetails(employeeProfileId, formData);
-      setBank(updated);
+      setBank(updated || null);
       setIsEditing(false);
     } catch (e: any) {
       setError(e.message || 'Failed to update bank details');

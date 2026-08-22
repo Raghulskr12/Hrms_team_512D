@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (storedToken) {
         setToken(storedToken);
         const currentUser = await authService.getCurrentUser();
-        setUser(currentUser);
+        setUser(currentUser || null);
       }
     } catch (error) {
       console.error('Failed to load authenticated user:', error);

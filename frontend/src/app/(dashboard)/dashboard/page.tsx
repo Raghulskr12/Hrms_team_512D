@@ -34,8 +34,8 @@ export default function EmployeeDashboardPage() {
         notificationService.getAll(),
       ]);
 
-      setProfile(profData);
-      setTodayAttendance(todayAtt);
+      setProfile(profData || null);
+      setTodayAttendance(todayAtt || null);
       setBalances(balData || []);
       setNotifications((notifData || []).slice(0, 5));
     } catch (e) {

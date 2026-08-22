@@ -26,7 +26,7 @@ export default function EmployeeProfilePage() {
     try {
       setLoading(true);
       const data = await profileService.getProfile();
-      setProfile(data);
+      setProfile(data || null);
     } catch (e) {
       console.error('Error fetching profile:', e);
     } finally {
@@ -49,11 +49,10 @@ export default function EmployeeProfilePage() {
   const fullName = `${profile.firstName} ${profile.lastName}`;
 
   const tabs = [
-    { id: 'personal', label: 'Personal Information', icon: <User className="w-4 h-4" /> },
-    { id: 'job', label: 'Job Information', icon: <Briefcase className="w-4 h-4" /> },
-    { id: 'bank', label: 'Bank Information', icon: <ShieldCheck className="w-4 h-4" /> },
-    { id: 'salary', label: 'Salary Information', icon: <DollarSign className="w-4 h-4" /> },
-    { id: 'documents', label: 'Documents', icon: <FileText className="w-4 h-4" /> },
+    { id: 'resume', label: 'Resume', icon: <User className="w-4 h-4" /> },
+    { id: 'personal', label: 'Private Info', icon: <ShieldCheck className="w-4 h-4" /> },
+    { id: 'salary', label: 'Salary Info', icon: <DollarSign className="w-4 h-4" /> },
+    { id: 'security', label: 'Security', icon: <FileText className="w-4 h-4" /> },
   ];
 
   return (
@@ -91,11 +90,10 @@ export default function EmployeeProfilePage() {
 
       {/* Tab Panels */}
       <div>
+        {activeTab === 'resume' && <ProfileJobTab profile={profile} />}
         {activeTab === 'personal' && <ProfilePersonalTab profile={profile} />}
-        {activeTab === 'job' && <ProfileJobTab profile={profile} />}
-        {activeTab === 'bank' && <ProfileBankTab employeeProfileId={profile.id} isEditable={true} />}
         {activeTab === 'salary' && <ProfileSalaryTab employeeProfileId={profile.id} isAdminOrHR={false} />}
-        {activeTab === 'documents' && <ProfileDocumentsTab employeeProfileId={profile.id} />}
+        {activeTab === 'security' && <div className="p-8 text-center text-slate-500">Security settings coming soon...</div>}
       </div>
 
       {/* Edit Profile Modal */}

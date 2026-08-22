@@ -31,7 +31,7 @@ export default function AdminDashboardPage() {
         leaveService.getAllRequests('PENDING'),
       ]);
 
-      setTotalEmployees(empRes.total || 0);
+      setTotalEmployees(empRes?.total || 0);
       setTodayAttendance(attRes || []);
       setPendingRequests(leaveRes || []);
     } catch (e) {

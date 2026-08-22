@@ -14,7 +14,7 @@ export default function EmployeeSalaryPage() {
     const fetchProf = async () => {
       try {
         const data = await profileService.getProfile();
-        setProfile(data);
+        setProfile(data || null);
       } catch (e) {
         console.error('Error fetching profile:', e);
       } finally {

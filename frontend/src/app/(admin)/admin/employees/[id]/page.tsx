@@ -29,7 +29,7 @@ export default function AdminEmployeeDetailsPage() {
     try {
       setLoading(true);
       const data = await employeeService.getById(id);
-      setEmployee(data);
+      setEmployee(data || null);
     } catch (e) {
       console.error('Error fetching employee details:', e);
     } finally {
